@@ -77,6 +77,7 @@ type Dish{
   price: Int
 }
 input restaurantInput{
+  id: Int
   name: String
   description: String
 }
@@ -93,29 +94,32 @@ type Mutation{
 
 var root = {
   restaurant: (arg) => {
-    restaurants[arg.id]
+    if(!restaurants[arg.id-1]){
+      throw new Error("restaurant not found");
+    }
+    return restaurants[arg.id-1];
   },
-  restaurants: () => {
-    restaurants
+  restaurants: () =>  {
+    return restaurants;
   },
   setrestaurant: ({ input }) => {
-    restaurants.push({ name: input.name, email: input.email, age: input.age });
+    restaurants.push({ id: input.id, name: input.name,  description: input.description});
     return input;
   },
   deleterestaurant: ({ id }) => {
-    const ok = Boolean(restaurants[id]);
+    const ok = Boolean(restaurants[id-1]);
     restaurants = restaurants.filter((item) => item.id !== id);
     return { ok };
   },
   editrestaurant: ({ id, ...restaurant }) => {
-    if (!restaurants[id]) {
+    if (!restaurants[id-1]) {
       throw new Error("restaurant not found");
     }
-    restaurants[id] = {
-      ...restaurants[id],
+    restaurants[id-1] = {
+      ...restaurants[id-1],
       ...restaurant,
     };
-    return restaurants[id];
+    return restaurants[id-1];
   },
 };
 var app = express();
